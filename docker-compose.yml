@@ -1,0 +1,12 @@
+version: '3'
+services:
+  moc:
+    image: ctfl/moc
+    env_file:
+      - .env
+    ports:
+      - 8080:80
+  moc-irc:
+    build: .
+    env_file:
+      - .env
