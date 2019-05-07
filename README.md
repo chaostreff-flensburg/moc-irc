@@ -4,7 +4,7 @@ Sends MOC Messages to IRC Channel
 
 ## Configuration
 
-### SQLite3 Config
+### Config
 
 ```bash
 API_ENDPOINT=http://moc
