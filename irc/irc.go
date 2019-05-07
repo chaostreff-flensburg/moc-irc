@@ -1,8 +1,8 @@
 package irc
 
 import (
+	"crypto/tls"
 	"fmt"
-	"net"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/irc.v3"
@@ -37,7 +37,11 @@ func NewIRC(addr, nick, pass, user, name, channel string) *IRC {
 // Connect sets the config and connects to the irc server. If the connection is, comes via the
 // channel client.Ready a nil. If an error occurs in this is the error.
 func (client *IRC) Connect() {
-	conn, err := net.Dial("tcp", client.Addr)
+	tlsConf := &tls.Config{
+		//InsecureSkipVerify: true,
+	}
+
+	conn, err := tls.Dial("tcp", client.Addr, tlsConf)
 	if err != nil {
 		client.Ready <- err
 	}
@@ -49,6 +53,7 @@ func (client *IRC) Connect() {
 		User: client.User,
 		Name: client.Name,
 		Handler: irc.HandlerFunc(func(c *irc.Client, m *irc.Message) {
+			log.Info(m.String())
 			if m.Command == "001" {
 				// 001 is a welcome event, so we join channels there
 				log.Info("Join ", client.Channel, " ...")
@@ -65,6 +70,7 @@ func (client *IRC) Connect() {
 	client.IRCClient = irc.NewClient(conn, config)
 	err = client.IRCClient.Run()
 	if err != nil {
+		log.Error(err)
 		client.Ready <- err
 	}
 }
